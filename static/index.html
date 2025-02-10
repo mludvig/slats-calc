@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="FenceCalc">
+    <link rel="apple-touch-icon" href="icon-512.png">
+    <link rel="manifest" href="manifest.json">
+    <title>Fence Slat Spacing Calculator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <h1>Fence Slat Spacing Calculator</h1>
+    <p>Enter the following values (in mm):</p>
+    <label for="pd">Distance Between Posts:</label><input type="number" id="pd" placeholder="e.g. 5000"><br>
+    <label for="ws">Slat Width:</label> <input type="number" id="ws" placeholder="e.g. 90"><br>
+    <button onclick="calculate()">Calculate</button>
+    <div id="result"></div>
+    <script>
+        function calculate() {
+            // Read inputs and convert to numbers 
+            var pd = parseFloat(document.getElementById('pd').value); var ws = parseFloat(document.getElementById('ws').value);
+            var G_MAX = 100; // maximum allowed gap in mm 
+            // Validate inputs 
+            if (isNaN(pd) || isNaN(ws) || pd <= 0 || ws <= 0) { alert('Please enter valid positive numbers.'); return; }
+            // Make sure the available span is big enough for at least one slat. 
+            if (pd < ws + 2 * G_MAX) { alert('The post distance seems too short relative to the slat width and desired max gap!'); return; }
+            // Compute the minimum number of boards needed. 
+            // This formula ensures (pd - n*ws)/(n+1) <= G_MAX. 
+            // Use Math.ceil but ensure the value is at least 1. 
+            var n_min = Math.ceil((pd - G_MAX) / (ws + G_MAX));
+            if (n_min < 1) { n_min = 1; }
+            // Compute the actual gap from one post to the next board (and edge) 
+            var gap = (pd - n_min * ws) / (n_min + 1);
+            // Build output: summary and table 
+            var output = '<h2>Results</h2>';
+            output += '<p>Number of slats: <strong>' + n_min + '</strong></p>';
+            output += '<p>Recommended gap: <strong>' + gap.toFixed(1) + ' mm</strong></p>';
+            // Build table of measurements from left post (gap then board positions): 
+            output += '<table>';
+            output += '<tr><th>Slat #</th><th>Left-Edge Position</th><th>Right-Edge Position</tr>\n';
+            for (var i = 1; i <= n_min; i++) { // The board is placed after the gap. 
+                var posLeft = gap + (i - 1) * (ws + gap);
+                var posRight = posLeft + ws;
+                // var posCenter = posLeft + ws / 2;
+                output += '<tr><td>' + i + '</td><td>' + posLeft.toFixed(1) + '</td><td>' + posRight.toFixed(1) + '</td></tr>\n';
+            } output += '</table>';
+            document.getElementById('result').innerHTML = output;
+        }
+    </script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js')
+                    .then(reg => {
+                        console.log('Service worker registered! 😎', reg);
+                    })
+                    .catch(err => {
+                        console.error('Registration failed! 😫', err);
+                    });
+            });
+        }
+    </script>
+</body>
+
+</html>
