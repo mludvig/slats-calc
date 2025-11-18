@@ -1,6 +1,6 @@
 {
-    "name": "Fence Slat Calculator",
-    "short_name": "FenceCalc",
+    "name": "Slat Spacing Calculator",
+    "short_name": "SlatCalc",
     "start_url": "./index.html",
     "display": "standalone",
     "background_color": "#ffffff",

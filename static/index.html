@@ -6,15 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="FenceCalc">
+    <meta name="apple-mobile-web-app-title" content="SlatCalc">
     <link rel="apple-touch-icon" href="icon-512.png">
     <link rel="manifest" href="manifest.json">
-    <title>Fence Slat Spacing Calculator</title>
+    <title>Slat Spacing Calculator</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
-    <h1>Fence Slat Spacing Calculator</h1>
+    <h1>Slat Spacing Calculator</h1>
 
     <div class="mode-tabs">
         <button class="tab-button active" onclick="setMode('max')">Max Spacing</button>
@@ -172,7 +172,7 @@
             } else {
                 headerText = 'Right Edge Position';
             }
-            
+
             output += '<table>';
             output += '<tr><th>Slat #</th><th>' + headerText + '</th></tr>\n';
             for (var i = 1; i <= n_slats; i++) {
