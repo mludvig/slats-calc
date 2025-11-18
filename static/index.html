@@ -15,7 +15,7 @@
 
 <body>
     <h1>Fence Slat Spacing Calculator</h1>
-    
+
     <div class="mode-tabs">
         <button class="tab-button active" onclick="setMode('max')">Max Spacing</button>
         <button class="tab-button" onclick="setMode('min')">Min Spacing</button>
@@ -25,39 +25,45 @@
     <p>Enter the following values (in mm):</p>
     <label for="pd">Distance Between Posts:</label><input type="number" id="pd" placeholder="e.g. 5000"><br>
     <label for="ws">Slat Width:</label> <input type="number" id="ws" placeholder="e.g. 90"><br>
-    
+
     <div id="maxSpacingInput" class="mode-input">
         <label for="maxGap">Maximum Gap:</label><input type="number" id="maxGap" value="100" placeholder="e.g. 100"><br>
     </div>
-    
+
     <div id="minSpacingInput" class="mode-input" style="display: none;">
         <label for="minGap">Minimum Gap:</label><input type="number" id="minGap" value="10" placeholder="e.g. 10"><br>
     </div>
-    
+
     <div id="countInput" class="mode-input" style="display: none;">
         <label for="slatCount">Number of Slats:</label><input type="number" id="slatCount" placeholder="e.g. 10"><br>
     </div>
-    
+
     <button onclick="calculate()">Calculate</button>
     <div id="result"></div>
     <script>
         var currentMode = 'max';
-        
+        var displayMode = 'left';
+
+        function setDisplayMode(mode) {
+            displayMode = mode;
+            calculate(); // Recalculate to update display
+        }
+
         function setMode(mode) {
             currentMode = mode;
-            
+
             // Update tab styles
             var tabs = document.querySelectorAll('.tab-button');
-            tabs.forEach(function(tab) {
+            tabs.forEach(function (tab) {
                 tab.classList.remove('active');
             });
             event.target.classList.add('active');
-            
+
             // Hide all mode inputs
             document.getElementById('maxSpacingInput').style.display = 'none';
             document.getElementById('minSpacingInput').style.display = 'none';
             document.getElementById('countInput').style.display = 'none';
-            
+
             // Show relevant input
             if (mode === 'max') {
                 document.getElementById('maxSpacingInput').style.display = 'block';
@@ -67,20 +73,20 @@
                 document.getElementById('countInput').style.display = 'block';
             }
         }
-        
+
         function calculate() {
-            // Read inputs and convert to numbers 
+            // Read inputs and convert to numbers
             var pd = parseFloat(document.getElementById('pd').value);
             var ws = parseFloat(document.getElementById('ws').value);
-            
-            // Validate inputs 
+
+            // Validate inputs
             if (isNaN(pd) || isNaN(ws) || pd <= 0 || ws <= 0) {
                 alert('Please enter valid positive numbers.');
                 return;
             }
-            
+
             var n_slats, gap;
-            
+
             if (currentMode === 'max') {
                 // Mode 1: Max spacing - create as big a gap as possible without exceeding max
                 var maxGap = parseFloat(document.getElementById('maxGap').value);
@@ -88,21 +94,21 @@
                     alert('Please enter a valid maximum gap.');
                     return;
                 }
-                
+
                 // Make sure the available span is big enough for at least one slat
                 if (pd < ws + 2 * maxGap) {
                     alert('The post distance seems too short relative to the slat width and desired max gap!');
                     return;
                 }
-                
+
                 // Compute the minimum number of boards needed
                 // This formula ensures (pd - n*ws)/(n+1) <= maxGap
                 n_slats = Math.ceil((pd - maxGap) / (ws + maxGap));
                 if (n_slats < 1) { n_slats = 1; }
-                
+
                 // Compute the actual gap
                 gap = (pd - n_slats * ws) / (n_slats + 1);
-                
+
             } else if (currentMode === 'min') {
                 // Mode 2: Min spacing - get as close to min gap as possible without going under
                 var minGap = parseFloat(document.getElementById('minGap').value);
@@ -110,7 +116,7 @@
                     alert('Please enter a valid minimum gap.');
                     return;
                 }
-                
+
                 // Compute the maximum number of boards that can fit
                 // This formula ensures (pd - n*ws)/(n+1) >= minGap
                 n_slats = Math.floor((pd - minGap) / (ws + minGap));
@@ -118,10 +124,10 @@
                     alert('Cannot fit even one slat with the specified minimum gap!');
                     return;
                 }
-                
+
                 // Compute the actual gap
                 gap = (pd - n_slats * ws) / (n_slats + 1);
-                
+
             } else if (currentMode === 'count') {
                 // Mode 3: Number of slats - evenly distribute with specified count
                 n_slats = parseInt(document.getElementById('slatCount').value);
@@ -129,34 +135,61 @@
                     alert('Please enter a valid number of slats.');
                     return;
                 }
-                
+
                 // Check if slats can fit
                 if (pd < n_slats * ws) {
                     alert('The slats cannot fit in the available space!');
                     return;
                 }
-                
+
                 // Compute the gap - evenly distributed
                 gap = (pd - n_slats * ws) / (n_slats + 1);
-                
+
                 if (gap < 0) {
                     alert('The slats cannot fit with the specified count!');
                     return;
                 }
             }
-            
-            // Build output: summary and table 
+
+            // Build output: summary and table
             var output = '<h2>Results</h2>';
             output += '<p>Number of slats: <strong>' + n_slats + '</strong></p>';
             output += '<p>Gap spacing: <strong>' + gap.toFixed(1) + ' mm</strong></p>';
-            
+
+            // Position display mode selector
+            output += '<div class="position-tabs">';
+            output += '<button class="pos-button ' + (displayMode === 'left' ? 'active' : '') + '" onclick="setDisplayMode(\'left\')">Left Edge</button>';
+            output += '<button class="pos-button ' + (displayMode === 'center' ? 'active' : '') + '" onclick="setDisplayMode(\'center\')">Center</button>';
+            output += '<button class="pos-button ' + (displayMode === 'right' ? 'active' : '') + '" onclick="setDisplayMode(\'right\')">Right Edge</button>';
+            output += '</div>';
+
             // Build table of measurements from left post
+            var headerText;
+            if (displayMode === 'left') {
+                headerText = 'Left Edge Position';
+            } else if (displayMode === 'center') {
+                headerText = 'Center Position';
+            } else {
+                headerText = 'Right Edge Position';
+            }
+            
             output += '<table>';
-            output += '<tr><th>Slat #</th><th>Left-Edge Position</th><th>Right-Edge Position</tr>\n';
+            output += '<tr><th>Slat #</th><th>' + headerText + '</th></tr>\n';
             for (var i = 1; i <= n_slats; i++) {
                 var posLeft = gap + (i - 1) * (ws + gap);
                 var posRight = posLeft + ws;
-                output += '<tr><td>' + i + '</td><td>' + posLeft.toFixed(1) + '</td><td>' + posRight.toFixed(1) + '</td></tr>\n';
+                var posCenter = posLeft + ws / 2;
+                var position;
+
+                if (displayMode === 'left') {
+                    position = posLeft.toFixed(0);
+                } else if (displayMode === 'center') {
+                    position = posCenter.toFixed(0);
+                } else {
+                    position = posRight.toFixed(0);
+                }
+
+                output += '<tr><td>' + i + '</td><td>' + position + '</td></tr>\n';
             }
             output += '</table>';
             document.getElementById('result').innerHTML = output;

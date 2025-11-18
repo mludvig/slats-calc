@@ -63,6 +63,40 @@ h2 {
     margin-bottom: 10px;
 }
 
+/* Position display tabs styling */
+.position-tabs {
+    display: flex;
+    gap: 0;
+    margin: 15px 0;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.pos-button {
+    flex: 1;
+    padding: 10px 8px;
+    background-color: #f0f0f0;
+    border: none;
+    border-radius: 0;
+    color: #333;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin: 0;
+    width: auto;
+}
+
+.pos-button:hover {
+    background-color: #e0e0e0;
+}
+
+.pos-button.active {
+    background-color: #28a745;
+    color: #fff;
+}
+
 /* Form styling: inputs and button */
 label {
     display: block;
@@ -143,6 +177,11 @@ th {
     .tab-button {
         font-size: 12px;
         padding: 10px 5px;
+    }
+
+    .pos-button {
+        font-size: 11px;
+        padding: 8px 5px;
     }
 
     input[type="number"] {
